@@ -1,6 +1,6 @@
 import { format, startOfWeek, parseISO } from "date-fns";
 
-export const formatDisplayDate = (date: Date | null): string => {
+export const formatDisplayDate = (date: string | null | undefined): string => {
 	if (!date) return "";
 	return format(date, "EEEE, d MMMM yyyy 'at' HH:mm");
 };

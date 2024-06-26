@@ -47,7 +47,7 @@ const Appointments: React.FC = () => {
 		startOfWeek(new Date(), { weekStartsOn: 1 })
 	);
 	const [groupedAppointments, setGroupedAppointments] = useState<{
-		[key: string]: any[];
+		[key: string]: Appointment[];
 	}>({});
 	const [loading, setLoading] = useState<boolean>(false);
 	const [appointment, setAppointment] =
@@ -67,20 +67,20 @@ const Appointments: React.FC = () => {
 		setCurrentWeek(prevWeek);
 	}, [currentWeek, setCurrentWeek]);
 
-	const fetchAppointments = async () => {
-		try {
-			const monday = format(getMonday(currentWeek), "yyyyMMdd");
-			const appointments = await getWeeklySlots(monday);
-			const grouped = groupAppointmentsByDay(appointments);
-			setGroupedAppointments(grouped);
-		} catch (error) {
-			console.error("Error fetching appointments:", error);
-		} finally {
-			setLoading(false);
-		}
-	};
-
 	useEffect(() => {
+		const fetchAppointments = async () => {
+			try {
+				const monday = format(getMonday(currentWeek), "yyyyMMdd");
+				const appointments = await getWeeklySlots(monday);
+				const grouped = groupAppointmentsByDay(appointments);
+				setGroupedAppointments(grouped);
+			} catch (error) {
+				console.error("Error fetching appointments:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
 		fetchAppointments();
 
 		const today = startOfDay(new Date());

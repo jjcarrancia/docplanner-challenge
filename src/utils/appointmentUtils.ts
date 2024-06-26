@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { Appointment } from "src/containers/Appointments";
 
 export const DAYS_OF_WEEK = [
 	"Monday",
@@ -11,7 +12,7 @@ export const DAYS_OF_WEEK = [
 ];
 
 export interface GroupedAppointments {
-	[key: string]: any[];
+	[key: string]: Appointment[];
 }
 
 export const initializeGroupedAppointments = (): GroupedAppointments => {
@@ -23,7 +24,7 @@ export const initializeGroupedAppointments = (): GroupedAppointments => {
 };
 
 export const groupAppointmentsByDay = (
-	appointments: any[]
+	appointments: Appointment[]
 ): GroupedAppointments => {
 	const groupedAppointments = initializeGroupedAppointments();
 

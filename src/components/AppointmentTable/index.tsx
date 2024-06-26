@@ -13,14 +13,14 @@ import { DAYS_OF_WEEK } from "src/utils/appointmentUtils";
 import { formatTime } from "src/utils/dateUtils";
 import Arrow from "src/components/Arrow";
 import { format, addDays, isToday, isTomorrow } from "date-fns";
-import { Appointment } from "src/containers/Appointments";
+import { Appointment } from "src/services/availabilityService";
 
 interface AppointmentTableProps {
 	groupedAppointments: { [key: string]: Appointment[] };
 	setSelectedNewAppointment: (appointment: Appointment) => void;
 	handlePrevWeek: () => void;
 	handleNextWeek: () => void;
-	currentWeek: any;
+	currentWeek: Date;
 	canGoBack: boolean;
 }
 
@@ -68,7 +68,7 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
 										<span>{format(showDay, "d MMM")}</span>
 									</Header>
 
-									{groupedAppointments[day].map((apt: any) => {
+									{groupedAppointments[day].map((apt: Appointment) => {
 										const formattedTime = formatTime(apt.Start);
 										return (
 											<Slot

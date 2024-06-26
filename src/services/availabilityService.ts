@@ -1,7 +1,26 @@
 import { AVAILABILITY_API_URL } from "src/config";
 
+export interface Appointment {
+	End: string;
+	Start: string;
+	Taken: boolean;
+}
+
+// Interface for booking slot request
+export interface BookSlotRequest {
+	Start: string | null | undefined;
+	End: string | null | undefined;
+	Comments: string;
+	Patient: {
+		Name: string;
+		SecondName: string;
+		Email: string;
+		Phone: string;
+	};
+}
+
 // Function to retrieve weekly slots
-export const getWeeklySlots = async (date: string): Promise<any> => {
+export const getWeeklySlots = async (date: string): Promise<Appointment[]> => {
 	try {
 		const response = await fetch(
 			`${AVAILABILITY_API_URL}/GetWeeklySlots/${date}`
@@ -18,7 +37,7 @@ export const getWeeklySlots = async (date: string): Promise<any> => {
 };
 
 // Function to book a slot
-export const bookSlot = async (data: any) => {
+export const bookSlot = async (data: BookSlotRequest) => {
 	try {
 		const response = await fetch(`${AVAILABILITY_API_URL}/BookSlot`, {
 			method: "POST",

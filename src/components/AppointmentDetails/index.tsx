@@ -1,10 +1,11 @@
 import React from "react";
 import { DateCard, Spinner, CalendarIcon } from "./styles";
 import { formatDisplayDate } from "src/utils/dateUtils";
+import { Appointment } from "src/containers/Appointments";
 
 interface AppointmentDetailsProps {
 	loading: boolean;
-	appointment: any;
+	appointment: Appointment;
 }
 
 const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({
