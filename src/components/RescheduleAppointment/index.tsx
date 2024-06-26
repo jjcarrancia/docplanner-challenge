@@ -3,7 +3,7 @@ import { formatDisplayDate } from "src/utils/dateUtils";
 import { RescheduleButton } from "./styles";
 
 interface RescheduleAppointmentProps {
-	updateAppointment: () => {};
+	updateAppointment: () => void;
 	loading: boolean;
 	selectedDate: Date | null | string;
 }
