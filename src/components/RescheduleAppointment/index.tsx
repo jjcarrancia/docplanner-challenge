@@ -3,7 +3,7 @@ import { formatDisplayDate } from "src/utils/dateUtils";
 import { RescheduleButton } from "./styles";
 
 interface RescheduleAppointmentProps {
-	updateAppointment: () => void;
+	updateAppointment: (newDate: any) => Promise<void>;
 	loading: boolean;
 	selectedDate: Date | null | string;
 }
@@ -25,7 +25,7 @@ const RescheduleAppointment: React.FC<RescheduleAppointmentProps> = ({
 			</p>
 			<RescheduleButton
 				onClick={() => {
-					updateAppointment(/* TODO: Add appointment here*/);
+					updateAppointment(selectedDate);
 				}}
 				disabled={!!loading}
 				data-testid="reschedule-button"

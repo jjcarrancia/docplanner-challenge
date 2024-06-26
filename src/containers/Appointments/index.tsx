@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { getWeeklySlots } from "src/services/availabilityService";
+import React, { useState, useEffect, useCallback } from "react";
+import { getWeeklySlots, bookSlot } from "src/services/availabilityService";
 import { groupAppointmentsByDay } from "src/utils/appointmentUtils";
 import { getMonday } from "src/utils/dateUtils";
-import { format, startOfWeek } from "date-fns";
+import { format, startOfWeek, startOfDay, isAfter, addDays } from "date-fns";
 
 const AppointmentDetails = React.lazy(
 	() => import("src/components/AppointmentDetails")
 );
 const RescheduleAppointment = React.lazy(
 	() => import("src/components/RescheduleAppointment")
+);
+const AppointmentTable = React.lazy(
+	() => import("src/components/AppointmentTable")
 );
 
 export interface Patient {
@@ -20,8 +23,8 @@ export interface Patient {
 
 export interface Appointment {
 	doctor: string;
-	Start: string;
-	End: string;
+	Start: string | null;
+	End: string | null;
 	Comments: string;
 	Patient: Patient;
 }
@@ -49,6 +52,20 @@ const Appointments: React.FC = () => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [appointment, setAppointment] =
 		useState<Appointment>(initialAppointment);
+	const [selectedNewAppointment, setSelectedNewAppointment] =
+		useState<Appointment | null>(null);
+	const [canGoBack, setCanGoBack] = useState<boolean>(false);
+
+	const handleNextWeek = useCallback(() => {
+		const nextWeek = new Date(currentWeek);
+		nextWeek.setDate(currentWeek.getDate() + 7);
+		setCurrentWeek(nextWeek);
+	}, [currentWeek, setCurrentWeek]);
+
+	const handlePrevWeek = useCallback(() => {
+		const prevWeek = startOfWeek(addDays(currentWeek, -7), { weekStartsOn: 1 });
+		setCurrentWeek(prevWeek);
+	}, [currentWeek, setCurrentWeek]);
 
 	const fetchAppointments = async () => {
 		try {
@@ -65,19 +82,46 @@ const Appointments: React.FC = () => {
 
 	useEffect(() => {
 		fetchAppointments();
+
+		const today = startOfDay(new Date());
+		const startOfCurrentWeek = startOfWeek(currentWeek, { weekStartsOn: 1 });
+		setCanGoBack(isAfter(startOfCurrentWeek, today));
 	}, [currentWeek]);
 
-	const updateAppointment = () => {
-		console.log("update appointment");
+	const updateAppointment = async () => {
+		setLoading(true);
+		const { doctor, ...data } = appointment;
+		const result = await bookSlot({
+			...data,
+			Start: selectedNewAppointment?.Start,
+			End: selectedNewAppointment?.End,
+		});
+		if (result.ok) {
+			setAppointment({
+				...appointment,
+				Start: selectedNewAppointment?.Start || null,
+				End: selectedNewAppointment?.End || null,
+			});
+			setSelectedNewAppointment(null);
+		}
+		setLoading(false);
 	};
 
 	return (
 		<div>
 			<AppointmentDetails appointment={appointment} loading={loading} />
+			<AppointmentTable
+				groupedAppointments={groupedAppointments}
+				currentWeek={currentWeek}
+				handleNextWeek={handleNextWeek}
+				handlePrevWeek={handlePrevWeek}
+				canGoBack={canGoBack}
+				setSelectedNewAppointment={setSelectedNewAppointment}
+			/>
 			<RescheduleAppointment
 				updateAppointment={updateAppointment}
 				loading={loading}
-				selectedDate={appointment.Start}
+				selectedDate={selectedNewAppointment?.Start || null}
 			/>
 		</div>
 	);
